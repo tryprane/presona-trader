@@ -100,6 +100,24 @@
 
 # ton_nft_images/*
 
+# Media files
+**/*.mp4
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.mov
+
+# Binary files
+**/intiface-engine
+**/intiface-engine/**
+
+# Large JSON files that shouldn't be in version control
+lore.json
+
+# Keep only one pnpm-lock.yaml at root
+packages/**/pnpm-lock.yaml
+
 node_modules
 /out
 
