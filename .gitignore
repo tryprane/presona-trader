@@ -104,7 +104,7 @@ node_modules
 /out
 
 
-packages/**/node_modules/
+packages/plugin-nvidia-nim/node_modules
 packages/**/.turbo/
 packages/**/dist/
 cache/
