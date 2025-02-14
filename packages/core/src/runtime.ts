@@ -70,7 +70,7 @@ function isDirectoryItem(item: any): item is DirectoryItem {
     );
 }
 
-export class AgentRuntime implements IAgentRuntime {
+export class  AgentRuntime implements IAgentRuntime {
     /**
      * Default count for recent messages to be kept in memory.
      * @private

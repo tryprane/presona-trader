@@ -1,0 +1,53 @@
+{
+    "name": "@elizaos/plugin-presagio-trader",
+    "version": "0.25.6-alpha.1",
+    "main": "dist/index.js",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+        "@elizaos/client-twitter": "workspace:*",
+        "@elizaos/core": "workspace:*",
+        "@safe-global/api-kit": "^2.5.8",
+        "@safe-global/protocol-kit": "^5.2.1",
+        "@safe-global/safe-core-sdk-types": "^5.1.0",
+        "@safe-global/safe-service-client": "^2.0.3",
+        "@safe-global/types-kit": "^1.0.2",
+        "axios": "^1.7.9",
+        "cheerio": "^1.0.0",
+        "dotenv": "^16.4.7",
+        "ethers": "^6.13.5",
+        "graphql-request": "^7.1.2",
+        "graphql-tag": "^2.12.6",
+        "puppeteer": "^24.1.1",
+        "viem": "^2.22.19",
+        "@tavily/core": "^0.0.2",
+        
+        "js-tiktoken": "1.0.15",
+       
+        
+       
+        "bignumber": "1.1.0",
+        "bignumber.js": "9.1.2",
+        "node-cache": "^5.1.2",
+        "tsup": "8.3.5",
+        "ws": "^8.0.0"
+    },
+    "devDependencies": {
+        "vitest": "^3.0.0",
+        "@vitest/coverage-v8": "^1.2.1"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --format esm --dts --watch",
+        "lint": "eslint --fix  --cache .",
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "test:coverage": "vitest run --coverage"
+    },
+    "peerDependencies": {
+        "whatwg-url": "7.1.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

@@ -2,6 +2,7 @@ import {
     parseBooleanFromText,
     type IAgentRuntime,
     ActionTimelineType,
+    elizaLogger,
 } from "@elizaos/core";
 import { z, ZodError } from "zod";
 
@@ -116,6 +117,8 @@ export async function validateTwitterConfig(
     runtime: IAgentRuntime
 ): Promise<TwitterConfig> {
     try {
+
+        elizaLogger.info('FLow is Here')
         const twitterConfig = {
             TWITTER_DRY_RUN:
                 parseBooleanFromText(

@@ -1,5 +1,9 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGoogleGenerativeAI  } from "@ai-sdk/google";
+import {
+    DynamicRetrievalMode,
+    GoogleGenerativeAI,
+  } from "@google/generative-ai"
 import { createMistral } from "@ai-sdk/mistral";
 import { createGroq } from "@ai-sdk/groq";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -571,6 +575,62 @@ export async function generateText({
                 break;
             }
 
+            // case ModelProviderName.GOOGLE: {
+            //     const { DynamicRetrievalMode, GoogleGenerativeAI } = require("@google/generative-ai");
+            
+            //     // Create the model configuration with search retrieval tool
+            //     const modelConfig = {
+            //         model: model, // Your existing model name
+            //         tools: [
+            //             {
+            //                 googleSearchRetrieval: {
+            //                     dynamicRetrievalConfig: {
+            //                         mode: DynamicRetrievalMode.MODE_DYNAMIC,
+            //                         dynamicThreshold: 0.7,
+            //                     },
+            //                 },
+            //             },
+            //         ],
+            //     };
+            
+            //     // Initialize the Google AI client with the new configuration
+            //     const google = new GoogleGenerativeAI(apiKey, {
+            //         apiVersion: "v1beta" // Required for using tools
+            //     });
+            
+            //     // Get the model instance with the search retrieval configuration
+            //     const modelInstance = google.getGenerativeModel(modelConfig);
+            
+            //     // Generate content with the configured model
+            //     const result = await modelInstance.generateContent({
+            //         // Correct format for contents
+            //         contents: [{
+            //             parts: [{
+            //                 text: context
+            //             }]
+            //         }],
+            //         // Correct parameter names for generation config
+            //         generationConfig: {
+            //             temperature: temperature,
+            //             max_output_tokens: max_response_length, // Changed from maxTokens
+            //             topK: 1,
+            //             topP: 1,
+            //             presencePenalty: presence_penalty,
+            //         },
+            //         tools: tools, // Your existing tools configuration
+            //     });
+            
+            //     // Extract the response text
+            //     const generatedResponse = await result.response;
+            //     response = generatedResponse.text();
+                
+            //     // Access grounding metadata if needed
+            //     const groundingMetadata = generatedResponse.candidates?.[0]?.groundingMetadata;
+                
+            //     elizaLogger.debug("Received response from Google model with grounding.");
+            //     break;
+            // }
+
             case ModelProviderName.ETERNALAI: {
                 elizaLogger.debug("Initializing EternalAI model.");
                 const openai = createOpenAI({
@@ -658,34 +718,86 @@ export async function generateText({
                 break;
             }
 
+            // case ModelProviderName.GOOGLE: {
+            //     const google = createGoogleGenerativeAI({
+            //         apiKey,
+            //         fetch: runtime.fetch,
+            //     });
+
+            //     // const newmid = new GoogleGenerativeAI(apiKey)
+
+            //     const { text: googleResponse } = await aiGenerateText({
+            //         model: google(model),
+            //         prompt: context,
+            //         system:
+            //             runtime.character.system ??
+            //             settings.SYSTEM_PROMPT ??
+            //             undefined,
+            //         tools: tools,
+            //         onStepFinish: onStepFinish,
+            //         maxSteps: maxSteps,
+            //         temperature: temperature,
+            //         maxTokens: max_response_length,
+            //         frequencyPenalty: frequency_penalty,
+            //         presencePenalty: presence_penalty,
+            //         experimental_telemetry: experimental_telemetry,
+            //     });
+
+            //     response = googleResponse;
+            //     elizaLogger.debug("Received response from Google model.");
+            //     break;
+            // }
+
             case ModelProviderName.GOOGLE: {
-                const google = createGoogleGenerativeAI({
-                    apiKey,
-                    fetch: runtime.fetch,
-                });
-
-                const { text: googleResponse } = await aiGenerateText({
-                    model: google(model),
-                    prompt: context,
-                    system:
-                        runtime.character.system ??
-                        settings.SYSTEM_PROMPT ??
-                        undefined,
-                    tools: tools,
-                    onStepFinish: onStepFinish,
-                    maxSteps: maxSteps,
+                const {
+                    GoogleGenerativeAI,
+                    HarmCategory,
+                    HarmBlockThreshold,
+                } = require("@google/generative-ai");
+            
+                // Initialize the Google AI client
+                const genAI = new GoogleGenerativeAI(apiKey);
+            
+                // Define generation config
+                const generationConfig = {
                     temperature: temperature,
-                    maxTokens: max_response_length,
-                    frequencyPenalty: frequency_penalty,
-                    presencePenalty: presence_penalty,
-                    experimental_telemetry: experimental_telemetry,
+                    topP: 0.95,
+                    topK: 40,
+                    maxOutputTokens: max_response_length,
+                    responseMimeType: "text/plain",
+                };
+            
+                // Get the model instance with configuration
+                const modelInstance = genAI.getGenerativeModel({
+                    model: "gemini-1.5-flash",
+                    tools: [{
+                        google_search_retrieval: {
+                            dynamic_retrieval_config: {
+                                mode: "MODE_DYNAMIC",
+                                dynamic_threshold: 0.3,
+                            },
+                        },
+                    }],
                 });
-
-                response = googleResponse;
-                elizaLogger.debug("Received response from Google model.");
+            
+                try {
+                    // Start chat session with configuration
+                    const chatSession = modelInstance.startChat({
+                        generationConfig,
+                        history: [],  // You can add chat history here if needed
+                    });
+            
+                    // Send message and get response
+                    const result = await chatSession.sendMessage(context);
+                    response = result.response.text();
+                    
+                    elizaLogger.debug("Received response from Google model.");
+                } catch (error) {
+                    elizaLogger.error("Error generating content:", error);
+                    throw error;
+                }
                 break;
             }
-
             case ModelProviderName.MISTRAL: {
                 const mistral = createMistral();
 
