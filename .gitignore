@@ -22,7 +22,10 @@ tweetcache/
 node-compile-cache/
 
 # Environment and config files
-.env*
+.env
+.env.production
+.env.local
+.env_main
 lit-config.json
 concatenated-output.ts
 embedding-cache.json
